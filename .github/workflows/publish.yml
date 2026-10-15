@@ -1,0 +1,45 @@
+name: Publish
+
+# Publishes @thefill/neo-neo-blessed to GitHub Packages when a GitHub release is published.
+# The release tag must match package.json's version (with or without a leading "v").
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://npm.pkg.github.com
+          scope: '@thefill'
+          cache: npm
+
+      - name: Verify release tag matches package.json version
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "${TAG_NAME#v}" != "$version" ]; then
+            echo "::error::Release tag $TAG_NAME does not match package.json version $version"
+            exit 1
+          fi
+
+      - run: npm ci
+
+      # prepublishOnly builds and runs the unit tests.
+      - name: Publish to GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm publish --tag ${{ github.event.release.prerelease && 'next' || 'latest' }}

@@ -1,5 +1,13 @@
 # neo-neo-blessed
 
+> **This is thefill's fork, published to GitHub Packages as `@thefill/neo-neo-blessed`.**
+> It exists for one fix: upstream 0.6.0–0.7.1 install blessed's event methods on Node's global
+> `EventEmitter.prototype`, which breaks every other emitter in the process (for example,
+> `fetch()` fails with `Cannot read properties of undefined (reading 'on')`). Here blessed uses its
+> own emitter subclass again. Install with
+> `@thefill:registry=https://npm.pkg.github.com` in your `.npmrc`; releases are published by
+> `.github/workflows/publish.yml` when a GitHub release is created.
+
 A fork of [neo-blessed](https://github.com/embark-framework/neo-blessed) (which is a fork of the original [blessed](https://github.com/chjj/blessed)) with bug fixes and maintenance.
 
 A curses-like library with a high level terminal interface API for node.js.
